@@ -13,16 +13,29 @@ namespace Finances.Backend.Controllers
         {
             _userService = userService;
         }
-        [HttpPost]
+        [HttpPost("new-user")]
         public async Task<IActionResult> NewUser(NewUserDto dto)
         {
             try
             {
                 await _userService.CreateUser(dto);
-                return Ok("Usuário cadastrado com sucesso!");
+                return Ok(new { message = "Usuário cadastrado com sucesso!"});
             } catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginDto dto)
+        {
+            try
+            {
+                var token = await _userService.Login(dto);
+                return Ok(new { token });
+            } catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
             }
         }
     }
