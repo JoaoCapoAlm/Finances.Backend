@@ -25,7 +25,7 @@ namespace Finances.Backend.Services
                 new Claim(ClaimTypes.DateOfBirth, user.Birth.ToString())
             ];
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Finances:SymmetricSecurityKey"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["SymmetricSecurityKey"]));
 
             var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
