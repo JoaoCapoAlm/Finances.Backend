@@ -9,11 +9,15 @@ namespace Finances.Backend.Services
     {
         private IMapper _mapper;
         private UserManager<User> _userManager;
+        private SignInManager<User> _signInManaer;
+        private TokenService _tokenService;
 
-        public UserService(IMapper mapper, UserManager<User> userManager)
+        public UserService(IMapper mapper, UserManager<User> userManager, SignInManager<User> signInManaer, TokenService tokenService)
         {
             _mapper = mapper;
             _userManager = userManager;
+            _signInManaer = signInManaer;
+            _tokenService = tokenService;
         }
 
         public async Task CreateUser(NewUserDto dto)
@@ -21,7 +25,6 @@ namespace Finances.Backend.Services
             User user = _mapper.Map<User>(dto);
 
             var result = await _userManager.CreateAsync(user, dto.Password);
-            _userManager.AddToRoleAsync(user, "User");
 
             if (result.Succeeded)
                 return;
@@ -31,7 +34,23 @@ namespace Finances.Backend.Services
             {
                 errorMessage += $"{e.Description}\n";
             }
-            throw new ArgumentException(errorMessage);
+            throw new ArgumentException(errorMessage.Trim());
+        }
+
+        public async Task<string> Login(LoginDto dto)
+        {
+            var result = await _signInManaer.PasswordSignInAsync(dto.Username, dto.Password, false, false);
+            if(!result.Succeeded)
+                throw new ApplicationException("Usuário e/ou senha incorretos!");
+
+            var user = _signInManaer
+                .UserManager
+                .Users
+                .Where(u => u.NormalizedUserName == dto.Username.ToUpper())
+                .FirstOrDefault() ?? throw new Exception("Usuário não encontrado!");
+
+            var token = _tokenService.GenerateToken(user);
+            return token;
         }
     }
 }
