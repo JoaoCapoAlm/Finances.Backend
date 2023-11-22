@@ -16,14 +16,9 @@ namespace Finances.Backend.Controllers
         [HttpPost]
         public async Task<IActionResult> NewUser(NewUserDto dto)
         {
-            try
-            {
-                await _userService.CreateUser(dto);
-                return Ok("Usuário cadastrado com sucesso!");
-            } catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            throw new Exception("Teste");
+            await _userService.CreateUser(dto);
+            return Ok("Usuário cadastrado com sucesso!");
         }
     }
 }

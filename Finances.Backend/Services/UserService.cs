@@ -16,22 +16,32 @@ namespace Finances.Backend.Services
             _userManager = userManager;
         }
 
+        private enum UserRoles
+        {
+            User = 1,
+            Admin = 2
+        }
+
         public async Task CreateUser(NewUserDto dto)
         {
             User user = _mapper.Map<User>(dto);
 
             var result = await _userManager.CreateAsync(user, dto.Password);
-            _userManager.AddToRoleAsync(user, "User");
 
             if (result.Succeeded)
-                return;
+            {
+                result = await _userManager.AddToRoleAsync(user, UserRoles.User.ToString());
+                if (result.Succeeded)
+                    return;
+                await _userManager.DeleteAsync(user);
+            }
 
             string errorMessage = string.Empty;
             foreach (var e in result.Errors)
             {
                 errorMessage += $"{e.Description}\n";
             }
-            throw new ArgumentException(errorMessage);
+            throw new Exception(errorMessage);
         }
     }
 }
