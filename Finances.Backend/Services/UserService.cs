@@ -20,6 +20,12 @@ namespace Finances.Backend.Services
             _tokenService = tokenService;
         }
 
+        private enum UserRoles
+        {
+            User = 1,
+            Admin = 2
+        }
+
         public async Task CreateUser(NewUserDto dto)
         {
             User user = _mapper.Map<User>(dto);
@@ -27,7 +33,12 @@ namespace Finances.Backend.Services
             var result = await _userManager.CreateAsync(user, dto.Password);
 
             if (result.Succeeded)
-                return;
+            {
+                result = await _userManager.AddToRoleAsync(user, UserRoles.User.ToString());
+                if (result.Succeeded)
+                    return;
+                await _userManager.DeleteAsync(user);
+            }
 
             string errorMessage = string.Empty;
             foreach (var e in result.Errors)
@@ -40,7 +51,7 @@ namespace Finances.Backend.Services
         public async Task<string> Login(LoginDto dto)
         {
             var result = await _signInManaer.PasswordSignInAsync(dto.Username, dto.Password, false, false);
-            if(!result.Succeeded)
+            if (!result.Succeeded)
                 throw new ApplicationException("Usuário e/ou senha incorretos!");
 
             var user = _signInManaer

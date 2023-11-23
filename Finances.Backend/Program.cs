@@ -1,6 +1,7 @@
 using System.Text;
 using Finances.Backend.Authorization;
 using Finances.Backend.Data;
+using Finances.Backend.Middlewares;
 using Finances.Backend.Model;
 using Finances.Backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddCors();
 builder.Services.AddDbContext<DataContext>(opts =>
 {
     opts.UseSqlServer(builder.Configuration["ConnectionStrings:DbConnection"]);
@@ -58,7 +60,12 @@ builder.Services.AddAuthorization(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseCors(options =>
+{
+    options.WithMethods("GET", "POST");
+});
+app.UseMiddleware(typeof(ErrorMiddleware));
+if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName.ToLower() == "local")
 {
     app.UseSwagger();
     app.UseSwaggerUI();
