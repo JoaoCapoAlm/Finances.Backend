@@ -2,8 +2,8 @@
 {
     public class ErrorResponseVM
     {
-        protected string TraceId { get; set; }
-        protected List<ErrorDetailVM> Errors { get; set; }
+        public string TraceId { get; set; }
+        public List<ErrorDetailVM> Errors { get; set; }
         public ErrorResponseVM(string logref, string message)
         {
             TraceId = Guid.NewGuid().ToString();
@@ -15,8 +15,8 @@
 
         public class ErrorDetailVM
         {
-            protected string LogRef { get; set; }
-            protected string Message { get; set; }
+            public string LogRef { get; set; }
+            public string Message { get; set; }
             public ErrorDetailVM(string logRef, string message)
             {
                 LogRef = logRef;

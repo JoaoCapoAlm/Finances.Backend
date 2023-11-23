@@ -1,7 +1,5 @@
 ﻿using System.Net;
-using System.Net.Mail;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Finances.Backend.Data.ViewModel;
 
 namespace Finances.Backend.Middlewares
@@ -34,7 +32,7 @@ namespace Finances.Backend.Middlewares
         {
             ErrorResponseVM errorResponseVM = new ErrorResponseVM(httpStatusCode.ToString(), message);
 
-            var result = JsonSerializer.Serialize(errorResponseVM);
+            var result = Newtonsoft.Json.JsonConvert.SerializeObject(errorResponseVM);
 
             context.Response.StatusCode = httpStatusCode.GetHashCode();
             context.Response.ContentType = "application/json";

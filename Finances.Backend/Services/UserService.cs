@@ -51,7 +51,7 @@ namespace Finances.Backend.Services
         public async Task<string> Login(LoginDto dto)
         {
             var result = await _signInManaer.PasswordSignInAsync(dto.Username, dto.Password, false, false);
-            if(!result.Succeeded)
+            if (!result.Succeeded)
                 throw new ApplicationException("Usuário e/ou senha incorretos!");
 
             var user = _signInManaer

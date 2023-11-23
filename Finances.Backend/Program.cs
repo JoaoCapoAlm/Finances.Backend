@@ -65,7 +65,7 @@ app.UseCors(options =>
     options.WithMethods("GET", "POST");
 });
 app.UseMiddleware(typeof(ErrorMiddleware));
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName.ToLower() == "local")
 {
     app.UseSwagger();
     app.UseSwaggerUI();
