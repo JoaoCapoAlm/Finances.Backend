@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,7 @@ builder.Services.AddDbContext<DataContext>(opts =>
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<DataContext>()
     .AddDefaultTokenProviders();
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<UserService>();
@@ -33,7 +35,6 @@ builder.Services.AddSingleton<IAuthorizationHandler, AgeAuthorization>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -49,13 +50,7 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
 });
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("MinAge", policy =>
-    {
-        policy.AddRequirements(new MinAge(18));
-    });
-});
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -65,16 +60,9 @@ app.UseCors(options =>
     options.WithMethods("GET", "POST");
 });
 app.UseMiddleware(typeof(ErrorMiddleware));
-if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName.ToLower() == "local")
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
