@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Finances.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231130210237_CreateGroupTables")]
-    partial class CreateGroupTables
+    [Migration("20231203212748_CreateGroupTable")]
+    partial class CreateGroupTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,46 @@ namespace Finances.Backend.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Finances.Backend.Model.Group", b =>
+                {
+                    b.Property<int>("IdGroup")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdGroup"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte>("IdStatusIdGroupStatus")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("IdGroup");
+
+                    b.HasIndex("IdStatusIdGroupStatus");
+
+                    b.ToTable("Group");
+                });
+
+            modelBuilder.Entity("Finances.Backend.Model.GroupStatus", b =>
+                {
+                    b.Property<byte>("IdGroupStatus")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("IdGroupStatus");
+
+                    b.ToTable("GroupStatus");
+                });
 
             modelBuilder.Entity("Finances.Backend.Model.User", b =>
                 {
@@ -224,6 +264,17 @@ namespace Finances.Backend.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Finances.Backend.Model.Group", b =>
+                {
+                    b.HasOne("Finances.Backend.Model.GroupStatus", "IdStatus")
+                        .WithMany()
+                        .HasForeignKey("IdStatusIdGroupStatus")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("IdStatus");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

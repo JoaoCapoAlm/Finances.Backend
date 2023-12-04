@@ -4,10 +4,10 @@ namespace Finances.Backend.Model
 {
     public class GroupStatus
     {
-        [Required]
+        [Key]
         public byte IdGroupStatus { get; set; }
         [Required]
         public string Name { get; set; }
-        public ICollection<Group> Groups { get; set; }
+        public virtual ICollection<Group> Groups { get; set; }
     }
 }
