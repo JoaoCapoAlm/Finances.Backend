@@ -8,5 +8,8 @@ namespace Finances.Backend.Data
     {
         public DataContext(DbContextOptions<DataContext> opts) : base(opts) {
         }
+
+        public DbSet<Group> Group { get; set; }
+        public DbSet<GroupStatus> GroupStatus { get; set; }
     }
 }
